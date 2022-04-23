@@ -1,92 +1,27 @@
 import React, { createContext, useState } from "react";
 
-interface AppDefaultState {
+interface AppStateValue {
   cart: {
-    items: {
-      name: string;
-      price: string;
-    }[];
+    items: { id: number; name: string; price: number }[];
   };
 }
 
-const defaultStateValue: AppDefaultState = {
+const defaultStateValue: AppStateValue = {
   cart: {
     items: [],
   },
 };
 
-export const AppStateContext = createContext(defaultStateValue);
+const AppStateContext = createContext(defaultStateValue);
 
-export const AppSetStateContext = createContext<
-  React.Dispatch<React.SetStateAction<AppDefaultState>> | undefined
->(undefined);
-
-const AppStateProvider: React.FC = ({ children }) => {
+const AppContextProvider: React.FC = ({ children }) => {
   const [state, setState] = useState(defaultStateValue);
+
   return (
     <AppStateContext.Provider value={state}>
-      <AppSetStateContext.Provider value={setState}>
-        {children}
-      </AppSetStateContext.Provider>
+      {children}
     </AppStateContext.Provider>
   );
 };
 
-export default AppStateProvider;
-
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-// import React, { createContext, useState } from "react";
-
-// interface AppStateValue {
-//   cart: {
-//     items: {
-//       name: string;
-//       price: number;
-//     }[];
-//   };
-// }
-
-// const defaultStateValue: AppStateValue = {
-//   cart: {
-//     items: [],
-//   },
-// };
-
-// const AppStateContext = createContext(defaultStateValue);
-
-// const AppStateProvider: React.FC = ({ children }) => {
-//   const [state, setState] = useState(defaultStateValue);
-//   return (
-//     <AppStateContext.Provider value={state}>
-//       {children}
-//     </AppStateContext.Provider>
-//   );
-// };
+export default AppContextProvider;

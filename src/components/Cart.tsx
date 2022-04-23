@@ -1,6 +1,7 @@
-import React from "react";
-import CartCss from "./Cart.module.css";
-import { AppStateContext } from "./AppState";
+import React from 'react';
+import { FiShoppingCart } from 'react-icons/fi';
+import CartCSS from './Cart.module.css';
+
 interface Props {}
 
 interface State {
@@ -13,45 +14,38 @@ class Cart extends React.Component<Props, State> {
     this.state = {
       isOpen: false,
     };
-    this.handleOpenCart = this.handleOpenCart.bind(this);
   }
 
-  handleOpenCart(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+  handleClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    // if ((e.target as HTMLElement).nodeName === 'SPAN') {
+    //   (e.target as HTMLSpanElement).;
+    // }
     this.setState((prevState) => ({ isOpen: !prevState.isOpen }));
-    if ((e.currentTarget as HTMLElement).nodeName !== "button") {
-      console.log(e.currentTarget);
-    }
-  }
+  };
+
   render() {
     return (
-      <AppStateContext.Consumer>
-        {(state) => {
-          return (
-            <div className={CartCss.cartContainer}>
-              <button
-                className={CartCss.button}
-                type="button"
-                onClick={this.handleOpenCart}
-              >
-                <span>{state.cart.items.length} pizzas</span>
-              </button>
-              {!this.state.isOpen ? null : (
-                <div
-                  className={CartCss.cartDropDown}
-                  style={{
-                    display: this.state.isOpen === true ? "block" : "none",
-                  }}
-                >
-                  <ul>
-                    <li>Marguerita</li>
-                    <li>Alemã</li>
-                  </ul>
-                </div>
-              )}
-            </div>
-          );
-        }}
-      </AppStateContext.Consumer>
+      <div className={CartCSS.cartContainer}>
+        <button
+          className={CartCSS.button}
+          type="button"
+          onClick={this.handleClick}
+        >
+          <FiShoppingCart />
+          <span>2 pizza(s)</span>
+        </button>
+        <div
+          className={CartCSS.cartDropDown}
+          style={{
+            display: this.state.isOpen ? 'block' : 'none',
+          }}
+        >
+          <ul>
+            <li>Napoletana</li>
+            <li>Marinara</li>
+          </ul>
+        </div>
+      </div>
     );
   }
 }
