@@ -1,6 +1,6 @@
-import React, { Component } from "react";
-import PizzaCss from "./Pizza.module.css";
-
+import React, { useContext } from "react";
+import PizzaCSS from "./Pizza.module.css";
+import { useDispatchState } from "./AppState";
 interface Pizza {
   id: number;
   name: string;
@@ -13,11 +13,29 @@ interface Props {
 }
 
 const Pizza: React.FC<Props> = ({ pizza }) => {
+  const dispatch = useDispatchState();
+
+  const handlerAddToCart = () => {
+    dispatch({
+      type: "ADD_TO_CARD",
+      payload: {
+        item: {
+          id: pizza.id,
+          name: pizza.name,
+          price: pizza.price,
+        },
+      },
+    });
+  };
+
   return (
-    <li className={PizzaCss.container}>
+    <li className={PizzaCSS.container}>
       <h2>{pizza.name}</h2>
       <p>{pizza.description}</p>
-      <strong>{pizza.price}</strong>
+      <p>{pizza.price}</p>
+      <p>
+        <button onClick={handlerAddToCart}>Add to cart</button>
+      </p>
     </li>
   );
 };
