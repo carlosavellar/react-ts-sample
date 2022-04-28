@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import PizzaCSS from "./Pizza.module.css";
-import { useSetState } from "./AppState";
+import { useDispatchState } from "./AppState";
 interface Pizza {
   id: number;
   name: string;
@@ -13,33 +13,18 @@ interface Props {
 }
 
 const Pizza: React.FC<Props> = ({ pizza }) => {
-  const setState = useSetState();
+  const dispatch = useDispatchState();
 
   const handlerAddToCart = () => {
-    setState((state) => {
-      const itemExist = state.cart.items.find((item) => item.id === pizza.id);
-      return {
-        ...state,
-        cart: {
-          ...state.cart,
-          items: itemExist
-            ? state.cart.items.map((item) => {
-                if (item.id === pizza.id) {
-                  return { ...item, quantity: item.quantity + 1 };
-                }
-                return item;
-              })
-            : [
-                ...state.cart.items,
-                {
-                  id: pizza.id,
-                  name: pizza.name,
-                  price: pizza.price,
-                  quantity: 1,
-                },
-              ],
+    dispatch({
+      type: "ADD_TO_CARD",
+      payload: {
+        item: {
+          id: pizza.id,
+          name: pizza.name,
+          price: pizza.price,
         },
-      };
+      },
     });
   };
 
