@@ -50,7 +50,7 @@ class Cart extends React.Component<Props, State> {
                 <ul>
                   {state.cart.items.map((pizza) => {
                     return (
-                      <li>
+                      <li key={pizza.id}>
                         {pizza.name} {pizza.quantity}
                       </li>
                     );
