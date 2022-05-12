@@ -1,15 +1,24 @@
-import React, { createContext, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useReducer,
+  useState,
+} from "react";
 
-interface AppDefaultState {
+interface CartItem {
+  id: number;
+  name: string;
+  price: number;
+  quantity: number;
+}
+interface AppStateValue {
   cart: {
-    items: {
-      name: string;
-      price: string;
-    }[];
+    items: CartItem[];
   };
 }
 
-const defaultStateValue: AppDefaultState = {
+const defaultStateValue: AppStateValue = {
   cart: {
     items: [],
   },
@@ -17,76 +26,97 @@ const defaultStateValue: AppDefaultState = {
 
 export const AppStateContext = createContext(defaultStateValue);
 
-export const AppSetStateContext = createContext<
-  React.Dispatch<React.SetStateAction<AppDefaultState>> | undefined
+export const AppDispatchStateContext = createContext<
+  React.Dispatch<AddItemAction> | undefined
 >(undefined);
 
-const AppStateProvider: React.FC = ({ children }) => {
-  const [state, setState] = useState(defaultStateValue);
+export const useDispatchState = () => {
+  const dispatch = useContext(AppDispatchStateContext);
+  if (!dispatch) {
+    throw new Error("NO dispatch in this context");
+  }
+  return dispatch;
+};
+
+interface Action<T> {
+  type: T;
+}
+
+interface AddItemAction extends Action<"ADD_ITEM"> {
+  payload: {
+    item: Omit<CartItem, "quantity">;
+  };
+}
+interface InitializeCart extends Action<"INITIALIZE_CART"> {
+  payload: {
+    cart: AppStateValue["cart"];
+  };
+}
+
+const reducer = (
+  state: AppStateValue,
+  action: AddItemAction | InitializeCart
+) => {
+  switch (action.type) {
+    case "ADD_ITEM":
+      const itemToAdd = action.payload.item;
+      const itemExist = state.cart.items.find(
+        (item) => item.id === itemToAdd.id
+      );
+      return {
+        ...state,
+        cart: {
+          ...state.cart,
+          items: itemExist
+            ? state.cart.items.map((item) => {
+                if (item.id === itemExist.id) {
+                  return { ...item, quantity: item.quantity + 1 };
+                }
+                return item;
+              })
+            : [
+                ...state.cart.items,
+                {
+                  id: itemToAdd.id,
+                  name: itemToAdd.name,
+                  price: itemToAdd.price,
+                  quantity: 1,
+                },
+              ],
+        },
+      };
+    case "INITIALIZE_CART":
+      return { ...state, cart: action.payload.cart };
+    default:
+      return state;
+  }
+};
+
+const AppContextProvider: React.FC = ({ children }) => {
+  // const [state, setState] = useState(defaultStateValue);
+  const [state, dispatch] = useReducer(reducer, defaultStateValue);
+
+  useEffect(() => {
+    const cart = window.localStorage.getItem("cart");
+    if (cart) {
+      dispatch({
+        type: "INITIALIZE_CART",
+        payload: { cart: JSON.parse(cart) },
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem("cart", JSON.stringify(state.cart));
+  }, [state.cart]);
+
   return (
     <AppStateContext.Provider value={state}>
-      <AppSetStateContext.Provider value={setState}>
+      <AppDispatchStateContext.Provider value={dispatch}>
         {children}
-      </AppSetStateContext.Provider>
+      </AppDispatchStateContext.Provider>
     </AppStateContext.Provider>
   );
 };
 
-export default AppStateProvider;
-
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-// import React, { createContext, useState } from "react";
-
-// interface AppStateValue {
-//   cart: {
-//     items: {
-//       name: string;
-//       price: number;
-//     }[];
-//   };
-// }
-
-// const defaultStateValue: AppStateValue = {
-//   cart: {
-//     items: [],
-//   },
-// };
-
-// const AppStateContext = createContext(defaultStateValue);
-
-// const AppStateProvider: React.FC = ({ children }) => {
-//   const [state, setState] = useState(defaultStateValue);
-//   return (
-//     <AppStateContext.Provider value={state}>
-//       {children}
-//     </AppStateContext.Provider>
-//   );
-// };
+export default AppContextProvider;
