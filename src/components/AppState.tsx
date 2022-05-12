@@ -44,7 +44,7 @@ interface Action<T> {
 
 interface AddItemAction extends Action<"ADD_ITEM"> {
   payload: {
-    item: CartItem;
+    item: Omit<CartItem, "quantity">;
   };
 }
 interface InitializeCart extends Action<"INITIALIZE_CART"> {
@@ -86,7 +86,10 @@ const reducer = (
         },
       };
     case "INITIALIZE_CART":
+      debugger;
       return { ...state, cart: action.payload.cart };
+    default:
+      return state;
   }
 };
 

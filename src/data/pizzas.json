@@ -9,7 +9,8 @@
     "id": 2,
     "name": "Marinara",
     "description": "Fresh tomatoes, extra virgin olive oil, oregano and garlic.",
-    "price": 14.99
+    "price": 14.99,
+    "specialOffer": "Barato pra caralho"
   },
   {
     "id": 3,

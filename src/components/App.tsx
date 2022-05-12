@@ -1,12 +1,14 @@
 import React from "react";
 import pizzas from "../data/pizzas.json";
-import Pizza from "./Pizza";
+import PizzaItem from "./Pizza";
 import Cart from "./Cart";
 import AppCSS from "./App.module.css";
 import PizzaSVG from "../svg/pizza.svg";
 import AppContextProvider from "./AppState";
+import SpecialOffer from "./SpecialOffer";
 
 const App = () => {
+  const spacialOffer = pizzas.find((pizza) => pizza.specialOffer);
   return (
     <AppContextProvider>
       <div className={AppCSS.container}>
@@ -15,9 +17,10 @@ const App = () => {
           <div className={AppCSS.siteTitle}>Delicious Pizza</div>
           <Cart />
         </div>
+        {spacialOffer && <SpecialOffer pizza={spacialOffer} />}
         <ul>
           {pizzas.map((pizza) => {
-            return <Pizza key={pizza.id} pizza={pizza} />;
+            return <PizzaItem key={pizza.id} pizza={pizza} />;
           })}
         </ul>
       </div>
