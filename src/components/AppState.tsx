@@ -86,7 +86,6 @@ const reducer = (
         },
       };
     case "INITIALIZE_CART":
-      debugger;
       return { ...state, cart: action.payload.cart };
     default:
       return state;
