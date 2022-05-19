@@ -1,25 +1,15 @@
-import React, { useContext } from "react";
+import React from "react";
 import { Pizza } from "./../types/types";
 import PizzaCSS from "./Pizza.module.css";
-import { useDispatchState } from "./AppState";
+import { withAddToCard, AddToCardProps } from "./AddToCard";
 
-interface Props {
+interface Props extends AddToCardProps{
   pizza: Pizza;
 }
 
-const SpecialOffer: React.FC<Props> = ({ pizza }) => {
-  const dispatch = useDispatchState();
+const SpecialOffer: React.FC<Props> = ({ pizza, addToCard }) => {
   const handlerAddToCart = () => {
-    dispatch({
-      type: "ADD_ITEM",
-      payload: {
-        item: {
-          id: pizza.id,
-          name: pizza.name,
-          price: pizza.price,
-        },
-      },
-    });
+    addToCard({id: pizza.id, name: pizza.name, price: pizza.price})
   };
   return (
     <div>
@@ -38,4 +28,4 @@ const SpecialOffer: React.FC<Props> = ({ pizza }) => {
   );
 };
 
-export default SpecialOffer;
+export default withAddToCard(SpecialOffer);
