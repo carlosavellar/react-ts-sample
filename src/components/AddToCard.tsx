@@ -37,5 +37,17 @@ export const WithAddToCardProps: React.FC<{ children: (props: AddToCardProps) =>
 };
 
 // sharing addToCard using HOOK. Hook function can or cannot use hook
+export const useAddToCard = () => {
+  const dispatch = useDispatchState();
+  const addToCard: AddToCardProps['addToCard'] = (item) => {
+    dispatch({
+      type: 'ADD_ITEM',
+      payload: {
+        item,
+      },
+    });
+  };
+  return addToCard;
+};
 
 //
