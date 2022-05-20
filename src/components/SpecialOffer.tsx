@@ -1,16 +1,13 @@
-import React from "react";
-import { Pizza } from "./../types/types";
-import PizzaCSS from "./Pizza.module.css";
-import { withAddToCard, AddToCardProps } from "./AddToCard";
+import React from 'react';
+import { Pizza } from './../types/types';
+import PizzaCSS from './Pizza.module.css';
+import { withAddToCard, AddToCardProps, WithAddToCardProps } from './AddToCard';
 
-interface Props extends AddToCardProps{
+interface Props {
   pizza: Pizza;
 }
 
-const SpecialOffer: React.FC<Props> = ({ pizza, addToCard }) => {
-  const handlerAddToCart = () => {
-    addToCard({id: pizza.id, name: pizza.name, price: pizza.price})
-  };
+const SpecialOffer: React.FC<Props> = ({ pizza }) => {
   return (
     <div>
       <li className={PizzaCSS.container}>
@@ -21,11 +18,24 @@ const SpecialOffer: React.FC<Props> = ({ pizza, addToCard }) => {
           <strong>🍕</strong>
         </p>
         <p>
-          <button onClick={handlerAddToCart}>Add to cart</button>
+          <WithAddToCardProps>
+            {({ addToCard }) => {
+              return (
+                <button
+                  onClick={() => {
+                    debugger;
+                    addToCard({ id: pizza.id, name: pizza.name, price: pizza.price });
+                  }}
+                >
+                  Add to cart
+                </button>
+              );
+            }}
+          </WithAddToCardProps>
         </p>
       </li>
     </div>
   );
 };
 
-export default withAddToCard(SpecialOffer);
+export default SpecialOffer;
