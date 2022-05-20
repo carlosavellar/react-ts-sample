@@ -1,7 +1,7 @@
-import React from "react";
-import { FiShoppingCart } from "react-icons/fi";
-import CartCSS from "./Cart.module.css";
-import { AppStateContext } from "./AppState";
+import React, { createRef } from 'react';
+import { FiShoppingCart } from 'react-icons/fi';
+import CartCSS from './Cart.module.css';
+import { AppStateContext } from './AppState';
 interface Props {}
 
 interface State {
@@ -9,11 +9,13 @@ interface State {
 }
 
 class Cart extends React.Component<Props, State> {
+  #contentRef: React.RefObject<HTMLDivElement>;
   constructor(props: Props) {
     super(props);
     this.state = {
       isOpen: false,
     };
+    this.#contentRef = createRef();
   }
 
   handleClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -23,6 +25,20 @@ class Cart extends React.Component<Props, State> {
     this.setState((prevState) => ({ isOpen: !prevState.isOpen }));
   };
 
+  handlerOutSideClick = (e: MouseEvent) => {
+    if (this.#contentRef.current && !this.#contentRef.current.contains(e.target as Node)) {
+      this.setState({ isOpen: false });
+    }
+  };
+
+  componentDidMount() {
+    document.addEventListener('mousedown', this.handlerOutSideClick);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('mousedown', this.handlerOutSideClick);
+  }
+
   render() {
     return (
       <AppStateContext.Consumer>
@@ -31,19 +47,15 @@ class Cart extends React.Component<Props, State> {
             return sum + item.quantity;
           }, 0);
           return (
-            <div className={CartCSS.cartContainer}>
-              <button
-                className={CartCSS.button}
-                type="button"
-                onClick={this.handleClick}
-              >
+            <div className={CartCSS.cartContainer} ref={this.#contentRef}>
+              <button className={CartCSS.button} type="button" onClick={this.handleClick}>
                 <FiShoppingCart />
-                <span>{itemsCount > 0 ? itemsCount : ""} pizza(s)</span>
+                <span>{itemsCount > 0 ? itemsCount : ''} pizza(s)</span>
               </button>
               <div
                 className={CartCSS.cartDropDown}
                 style={{
-                  display: this.state.isOpen ? "block" : "none",
+                  display: this.state.isOpen ? 'block' : 'none',
                 }}
               >
                 <ul>
