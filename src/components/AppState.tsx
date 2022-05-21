@@ -1,8 +1,14 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useReducer, useState } from 'react';
 
+interface CartItem {
+  id: number;
+  name: string;
+  price: number;
+  quantity: number;
+}
 interface AppStateValue {
   cart: {
-    items: { id: number; name: string; price: number; quantity: number }[];
+    items: CartItem[];
   };
 }
 
@@ -14,26 +20,63 @@ const defaultStateValue: AppStateValue = {
 
 export const AppStateContext = createContext(defaultStateValue);
 
-export const AppSetStateContext = createContext<
-  React.Dispatch<React.SetStateAction<AppStateValue>> | undefined
->(undefined);
+export const AppDispatchStateContext = createContext<React.Dispatch<AddToCard> | undefined>(undefined);
 
-export const useSetState = () => {
-  const setState = useContext(AppSetStateContext);
-  if (!setState) {
-    throw new Error("NO setState in this context");
+export const useDispathState = () => {
+  const dispatch = useContext(AppDispatchStateContext);
+  if (!dispatch) {
+    throw new Error('NO dispatch in this context');
   }
-  return setState;
+  return dispatch;
+};
+
+interface Action<T> {
+  type: T;
+}
+
+interface AddToCard extends Action<'ADD_TO_CARD'> {
+  payload: {
+    item: Omit<CartItem, 'quantity'>;
+  };
+}
+
+const reducer = (state: AppStateValue, action: AddToCard) => {
+  const itemToAdd = action.payload.item;
+  switch (action.type) {
+    case 'ADD_TO_CARD':
+      const itemExist = state.cart.items.find((item) => item.id === itemToAdd.id);
+      return {
+        ...state,
+        cart: {
+          ...state.cart,
+          items: itemExist
+            ? state.cart.items.map((item) => {
+                if (item.id === itemToAdd.id) {
+                  return { ...item, quantity: item.quantity + 1 };
+                }
+                return item;
+              })
+            : [
+                ...state.cart.items,
+                {
+                  id: itemToAdd.id,
+                  name: itemToAdd.name,
+                  price: itemToAdd.price,
+                  quantity: 1,
+                },
+              ],
+        },
+      };
+    default:
+      return state;
+  }
 };
 
 const AppContextProvider: React.FC = ({ children }) => {
-  const [state, setState] = useState(defaultStateValue);
-
+  const [state, dispatch] = useReducer(reducer, defaultStateValue);
   return (
     <AppStateContext.Provider value={state}>
-      <AppSetStateContext.Provider value={setState}>
-        {children}
-      </AppSetStateContext.Provider>
+      <AppDispatchStateContext.Provider value={dispatch}>{children}</AppDispatchStateContext.Provider>
     </AppStateContext.Provider>
   );
 };
